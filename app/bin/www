@@ -1,0 +1,58 @@
+//const path = require('path');
+require("dotenv").config();
+// require("dotenv").config({
+//     path: path.resolve(__dirname, `${process.env.NODE_ENV}.env`)
+// });
+
+const app = require("../../app");
+const http = require("http");
+const besturl = process.env.BES_URL || "http://localhost:";
+
+/** Set PORT */
+const port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
+
+/** Create http server */
+const server = http.createServer(app);
+
+/** set listen your http server */
+server.listen(port);
+server.on("error", onError);
+server.on("listening", onListening);
+
+function normalizePort (val) {
+    let portVal = parseInt(val, 10)
+    if (isNaN(portVal)) {
+        return val
+    }
+    if (portVal >= 0) {
+        return portVal
+    }
+    return false
+}
+
+function onError (err) {
+    if (err.syscall !== "listen") {
+        throw err;
+    }
+    const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+    // handle specific listen errors with friendly messages
+    switch (err.code) {
+        case "EACCES":
+        console.log(bind + " requires elevated privileges");
+        process.exit(1);
+        break;
+        case "EADDRINUSE":
+        console.log(bind + " is already in use");
+        process.exit(1);
+        break;
+        default:
+        throw err;
+    }
+}
+
+function onListening () {
+    const addr = server.address();
+    console.log(`🚀 Server ready at local  : http://localhost:${addr.port}/`)
+    console.log(`🚀 Server ready at public : ${besturl == 'http://localhost:' ? besturl+port : besturl}/`)
+}
